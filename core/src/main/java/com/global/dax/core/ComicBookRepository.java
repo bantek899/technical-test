@@ -1,9 +1,12 @@
 package com.global.dax.core;
 
+import com.global.dax.core.model.ComicBook;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import com.global.dax.core.model.ComicBook;
+import java.util.Objects;
+import java.util.Set;
+import java.util.function.Predicate;
 
 public class ComicBookRepository {
 
@@ -20,8 +23,8 @@ public class ComicBookRepository {
     }
 
     public void add(final ComicBook comicBook) {
-
-        comicBooks.add(comicBook);
+        if (!comicBooks.contains(comicBook))
+            comicBooks.add(comicBook);
     }
 
     public List<ComicBook> getComicBooks() {
@@ -35,9 +38,20 @@ public class ComicBookRepository {
     }
 
     public List<ComicBook> searchBySeries(final String series) {
-
-        return null; // TODO: Implement this
+        return comicBooks.stream().filter(comicBook -> comicBook.series().equals(series)).toList();
     }
 
-    // TODO: add ability to remove comic book from repository
+    public List<ComicBook> search(final Predicate<ComicBook> predicate) {
+        Objects.requireNonNull(predicate, "predicate must not be null");
+        return comicBooks.stream().filter(predicate).toList();
+    }
+
+    public List<ComicBook> searchByCharacters(final Set<String> characters) {
+        Predicate<ComicBook> predicate = comic -> comic.characters().stream().anyMatch(characters::contains);
+        return comicBooks.stream().filter(predicate).toList();
+    }
+
+    public boolean remove(final ComicBook comicBook) {
+        return comicBooks.remove(comicBook);
+    }
 }
